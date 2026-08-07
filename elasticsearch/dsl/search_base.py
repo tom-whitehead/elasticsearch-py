@@ -41,7 +41,7 @@ from .document_base import InstrumentedField
 from .exceptions import IllegalOperation
 from .query import Bool, Q, Query
 from .response import Hit, Response
-from .retriever import Retriever
+from .retriever import R, Retriever
 from .utils import _R, AnyUsingType, AttrDict, DslBase, recursive_to_dict
 
 if TYPE_CHECKING:
@@ -531,7 +531,7 @@ class SearchBase(Request[_R]):
         if "rank" in d:
             self._rank = d.pop("rank")
         if "retriever" in d:
-            self._retriever = d.pop("retriever")
+            self._retriever = cast(Retriever, R(d.pop("retriever")))
         if "collapse" in d:
             self._collapse = d.pop("collapse")
         if "sort" in d:
@@ -681,7 +681,7 @@ class SearchBase(Request[_R]):
         Example::
 
             s = Search()
-            s = s.retrievers(StandardRetriever(query=Match(text="search text")))
+            s = s.retriever(StandardRetriever(query=Match(text="search text")))
         """
         s = self._clone()
         s._retriever = retriever
